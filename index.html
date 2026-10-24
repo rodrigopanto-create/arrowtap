@@ -1,19 +1,39 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0d0d1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tap Away">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
     <title>Tap Away Arcade</title>
     <style>
         html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0d0d1a; }
         canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+        [hidden] { display: none !important; }
+        #install-panel { position: fixed; top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); z-index: 2; max-width: min(300px, calc(100vw - 32px)); padding: 8px; background: #0d0d1a; border: 1px solid #00df75; color: #fff; font: 14px monospace; }
+        button { padding: 8px 12px; background: #18263f; color: #adff2f; border: 1px solid #00df75; cursor: pointer; font: inherit; }
+        #install-help { line-height: 1.5; margin: 8px 0 0; }
     </style>
 </head>
 <body>
     <canvas id="glcanvas" tabindex="1"></canvas>
-    <!-- Build with cargo build --release --target wasm32-unknown-unknown, then serve this directory over HTTP. -->
-    <script src="https://cdn.jsdelivr.net/gh/not-fl3/miniquad@4f13d4a70caf6a8cbf0187a95461658e7812b566/js/gl.js"></script>
+    <aside id="install-panel" hidden aria-label="Instalar aplicación">
+        <button id="install-button" type="button">INSTALAR APP</button>
+        <button id="install-close" type="button" aria-label="Ocultar instalación">X</button>
+        <p id="install-help" role="status" hidden></p>
+    </aside>
+    <!-- Local preview: build with cargo build --release --target wasm32-unknown-unknown,
+         download the pinned loader below as gl.js, then serve this directory over HTTP.
+         GitHub Actions downloads the loader and publishes all PWA assets automatically.
+         Loader: https://cdn.jsdelivr.net/gh/not-fl3/miniquad@4f13d4a70caf6a8cbf0187a95461658e7812b566/js/gl.js -->
+    <script src="gl.js"></script>
     <script src="highscores.js"></script>
+    <script src="pwa.js"></script>
     <script>load("target/wasm32-unknown-unknown/release/arrow.wasm");</script>
 </body>
 </html>

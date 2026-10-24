@@ -30,7 +30,9 @@ jobs:
       - name: Prepare website
         run: |
           mkdir -p dist/target/wasm32-unknown-unknown/release
-          cp index.html highscores.js dist/
+          cp index.html highscores.js pwa.js sw.js manifest.webmanifest dist/
+          cp -R icons dist/
+          curl --fail --location --retry 3 https://cdn.jsdelivr.net/gh/not-fl3/miniquad@4f13d4a70caf6a8cbf0187a95461658e7812b566/js/gl.js -o dist/gl.js
           cp target/wasm32-unknown-unknown/release/arrow.wasm dist/target/wasm32-unknown-unknown/release/
       - name: Configure Pages
         uses: actions/configure-pages@v5

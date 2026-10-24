@@ -215,7 +215,6 @@ fn write_scores(data: &str) -> Result<(), String> {
 enum Screen {
     Start,
     Playing,
-    Victory,
     Highscores,
 }
 
@@ -225,7 +224,6 @@ struct Game {
     board: Board,
     level: u32,
     total_score: u64,
-    last_score: u64,
     elapsed: f32,
     mistakes: u32,
     highscores: Vec<ScoreEntry>,
@@ -252,7 +250,6 @@ impl Game {
             },
             level: 1,
             total_score: 0,
-            last_score: 0,
             elapsed: 0.0,
             mistakes: 0,
             highscores,
@@ -270,10 +267,10 @@ impl Game {
 
     fn win(&mut self) {
         let (_, density) = level_settings(self.level);
-        self.last_score = level_score(density, self.level, self.elapsed, self.mistakes);
-        self.total_score = self.total_score.saturating_add(self.last_score);
+        let score = level_score(density, self.level, self.elapsed, self.mistakes);
+        self.total_score = self.total_score.saturating_add(score);
         self.highscores.push(ScoreEntry {
-            score: self.last_score,
+            score,
             level: self.level,
         });
         sort_scores(&mut self.highscores);
@@ -284,7 +281,8 @@ impl Game {
                 self.storage_error = Some(error);
             }
         }
-        self.screen = Screen::Victory;
+        self.level = self.level.saturating_add(1);
+        self.start_level();
     }
 }
 
@@ -445,38 +443,15 @@ async fn main() {
                     game.screen = Screen::Highscores;
                 }
             }
-            Screen::Playing => play_frame(&mut game, pointer),
-            Screen::Victory => {
-                centered_text("VICTORY!", base + 20.0, 48.0, LIME);
-                centered_text(
-                    &format!("LEVEL {} COMPLETE", game.level),
-                    base + 58.0,
-                    24.0,
-                    WHITE,
-                );
-                centered_text(
-                    &format!("LEVEL SCORE: {}", game.last_score),
-                    base + 91.0,
-                    22.0,
-                    SKYBLUE,
-                );
-                centered_text(
-                    &format!("TOTAL: {}", game.total_score),
-                    base + 120.0,
-                    22.0,
-                    WHITE,
-                );
-                let next = button("NEXT LEVEL / ENTER", base + 145.0, pointer);
-                let scores = button("HIGHSCORES / H", base + 199.0, pointer);
-                let menu = button("MAIN MENU / ESC", base + 253.0, pointer);
-                if next || confirm {
-                    game.level = game.level.saturating_add(1);
-                    game.start_level();
-                } else if scores || is_key_pressed(KeyCode::H) {
-                    game.scores_return = Screen::Victory;
-                    game.screen = Screen::Highscores;
-                } else if menu || is_key_pressed(KeyCode::Escape) {
+            Screen::Playing => {
+                let menu = button("MAIN MENU / ESC", screen_height() - 64.0, pointer);
+                if menu || is_key_pressed(KeyCode::Escape) {
                     game.screen = Screen::Start;
+                } else if is_key_pressed(KeyCode::H) {
+                    game.scores_return = Screen::Playing;
+                    game.screen = Screen::Highscores;
+                } else {
+                    play_frame(&mut game, pointer);
                 }
             }
             Screen::Highscores => {
