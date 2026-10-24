@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>Tap Away Arcade</title>
+    <style>
+        html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0d0d1a; }
+        canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+    </style>
+</head>
+<body>
+    <canvas id="glcanvas" tabindex="1"></canvas>
+    <!-- Build with cargo build --release --target wasm32-unknown-unknown, then serve this directory over HTTP. -->
+    <script src="https://cdn.jsdelivr.net/gh/not-fl3/miniquad@4f13d4a70caf6a8cbf0187a95461658e7812b566/js/gl.js"></script>
+    <script src="highscores.js"></script>
+    <script>load("target/wasm32-unknown-unknown/release/arrow.wasm");</script>
+</body>
+</html>
